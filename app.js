@@ -13,7 +13,7 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const app = express();
 const DataBaseURL = 'mongodb://127.0.0.1:27017/bitfilmsdb';
-const { PORT = 3000, DataBaseProduction = DataBaseURL } = process.env;
+const { PORT = 3005, DataBaseProduction = DataBaseURL } = process.env;
 
 mongoose
   .connect(DataBaseProduction)
