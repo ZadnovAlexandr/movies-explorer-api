@@ -13,7 +13,6 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { PORT, DataBaseProduction } = require('./utils/config');
 
 const app = express();
-
 mongoose
   .connect(DataBaseProduction)
   .then(() => {
