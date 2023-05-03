@@ -10,10 +10,9 @@ const { cors } = require('./middlewares/cors');
 const { limiter } = require('./middlewares/limiter');
 const { errorMiddlewares } = require('./middlewares/errorMiddlewares');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const { PORT, DataBaseProduction } = require('./utils/config');
 
 const app = express();
-const DataBaseURL = 'mongodb://127.0.0.1:27017/bitfilmsdb';
-const { PORT = 3005, DataBaseProduction = DataBaseURL } = process.env;
 
 mongoose
   .connect(DataBaseProduction)

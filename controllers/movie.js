@@ -5,8 +5,10 @@ const ErrorInternalServer = require('../errors/ErrorInternalServer');
 const ErrorNotFound = require('../errors/ErrorNotFound');
 const ErrorForbidden = require('../errors/ErrorForbidden');
 
+const { errControlMessage } = require('../utils/constants');
+
 const getMovies = (req, res, next) => {
-  Movie.find({})
+  Movie.find({ owner: req.user._id })
     .then((movies) => {
       res.send(movies);
     })
@@ -44,10 +46,10 @@ const createMovie = (req, res, next) => {
   })
     .then((movie) => res.send(movie))
     .catch((error) => {
-      if (error.name === 'ValidationError') {
-        next(new ErrorBadRequest('Переданы некорректные данные'));
+      if (error.name === errControlMessage.validationErr) {
+        next(new ErrorBadRequest(errControlMessage.incorrectData));
       } else {
-        next(new ErrorInternalServer('На сервере произошла ошибка'));
+        next(new ErrorInternalServer(errControlMessage.serverErr));
       }
     });
 };
@@ -65,20 +67,16 @@ const deleteMovie = (req, res, next) => {
           })
           .catch(next);
       } else {
-        next(
-          new ErrorForbidden(
-            'Вы не можете удалить фильм, созданный другим пользователем',
-          ),
-        );
+        next(new ErrorForbidden(errControlMessage.filmDeletingSomeone));
       }
     })
     .catch((error) => {
-      if (error.name === 'CastError') {
-        next(new ErrorBadRequest('Переданы некорректные данные'));
-      } else if (error.name === 'DocumentNotFoundError') {
-        next(new ErrorNotFound('Фильм с указанным id не найден'));
+      if (error.name === errControlMessage.castErr) {
+        next(new ErrorBadRequest(errControlMessage.incorrectData));
+      } else if (error.name === errControlMessage.documentNotFoundErr) {
+        next(new ErrorNotFound(errControlMessage.movieNotFound));
       } else {
-        next(new ErrorInternalServer('На сервере произошла ошибка'));
+        next(new ErrorInternalServer(errControlMessage.serverErr));
       }
     });
 };

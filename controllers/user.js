@@ -12,14 +12,15 @@ const ErrorNotFound = require('../errors/ErrorNotFound');
 const ErrorUnauthorized = require('../errors/ErrorUnauthorized');
 const ErrorConflict = require('../errors/ErrorConflict');
 
-const { JWT_SECRET, NODE_ENV } = process.env;
+const { NODE_ENV, JWT_SECRET } = require('../utils/config');
+const { errControlMessage } = require('../utils/constants');
 
 const getUserInfo = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (user) res.send(user);
       else {
-        next(new ErrorNotFound('Пользователь не найден'));
+        next(new ErrorNotFound(errControlMessage.userNotFound));
       }
     })
     .catch(next);
@@ -35,16 +36,14 @@ const updateUser = (req, res, next) => {
     .orFail()
     .then((user) => res.status(STATUS_OK).send(user))
     .catch((error) => {
-      if (error.name === 'ValidationError') {
-        next(
-          new ErrorBadRequest(
-            'Переданы некорректные данные для редактирования пользователя',
-          ),
-        );
-      } else if (error.name === 'DocumentNotFoundError') {
-        next(new ErrorNotFound('Пользователь не найден'));
+      if (error.name === errControlMessage.validationErr) {
+        next(new ErrorBadRequest(errControlMessage.incorrectData));
+      } else if (error.name === errControlMessage.documentNotFoundErr) {
+        next(new ErrorNotFound(errControlMessage.userNotFound));
+      } else if (error.code === 11000) {
+        next(new ErrorConflict(errControlMessage.duplicateEmail));
       } else {
-        next(new ErrorInternalServer('На сервере произошла ошибка'));
+        next(new ErrorInternalServer(errControlMessage.serverErr));
       }
     });
 };
@@ -65,14 +64,12 @@ const createUser = (req, res, next) => {
       email: users.email,
     }))
     .catch((error) => {
-      if (error.name === 'ValidationError') {
-        next(new ErrorBadRequest('Некорректные данные'));
+      if (error.name === errControlMessage.validationErr) {
+        next(new ErrorBadRequest(errControlMessage.incorrectData));
       } else if (error.code === 11000) {
-        next(
-          new ErrorConflict('Пользователь с данным email уже зарегистрирован'),
-        );
+        next(new ErrorConflict(errControlMessage.duplicateEmail));
       } else {
-        next(new ErrorInternalServer('На сервере произошла ошибка'));
+        next(new ErrorInternalServer(errControlMessage.serverErr));
       }
     });
 };
@@ -83,7 +80,7 @@ const login = (req, res, next) => {
     .select('+password')
     .then(async (user) => {
       if (!user) {
-        return next(new ErrorUnauthorized('Неправильные почта или пароль'));
+        return next(new ErrorUnauthorized(errControlMessage.autorizationErr));
       }
       const data = await bcrypt.compare(password, user.password);
       if (data) {
@@ -96,9 +93,9 @@ const login = (req, res, next) => {
             httpOnly: true,
             sameSite: NODE_ENV === 'production' ? true : 'none',
           })
-          .send({ message: 'Вход выполнен!' });
+          .send({ message: errControlMessage.loginCompleted });
       }
-      return next(new ErrorUnauthorized('Неправильные почта или пароль'));
+      return next(new ErrorUnauthorized(errControlMessage.autorizationErr));
     })
     .catch(next);
 };
@@ -111,7 +108,7 @@ const logout = (req, res, next) => {
         sameSite: NODE_ENV === 'production' ? true : 'none',
         secure: true,
       })
-      .send({ message: 'Выход' });
+      .send({ message: errControlMessage.logOut });
   } catch (error) {
     next(error);
   }

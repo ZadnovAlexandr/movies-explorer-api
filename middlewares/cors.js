@@ -1,11 +1,4 @@
-const allowedCors = [
-  'https://a.zhadnov-movies.nomoredomains.monster',
-  'http://a.zhadnov-movies.nomoredomains.monster',
-  'https://a.zhadnov-movies-front.nomoredomains.monster',
-  'http://a.zhadnov-movies-front.nomoredomains.monster',
-  'https://localhost:3000',
-  'http://localhost:3000',
-];
+const { allowedCors } = require('../utils/config');
 
 const cors = (req, res, next) => {
   const { origin } = req.headers;

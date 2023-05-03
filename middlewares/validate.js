@@ -1,18 +1,19 @@
 const { Joi, celebrate } = require('celebrate');
 
-const urlRegExp = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/;
+const { urlRegExp } = require('../utils/constants');
+const { errMiddlewaresMessage } = require('../utils/constants');
 
 const createUsersVal = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email().messages({
-      'any.require': 'Введен некорректный email',
+      'any.require': errMiddlewaresMessage.incorrectEmail,
     }),
     password: Joi.string().required().messages({
-      'any.require': 'Введен некорректный пароль',
+      'any.require': errMiddlewaresMessage.incorrectPassword,
     }),
     name: Joi.string().required().min(2).max(30)
       .messages({
-        'any.require': 'Введено некорректное имя пользователя',
+        'any.require': errMiddlewaresMessage.incorrectName,
       }),
   }),
 });
@@ -20,10 +21,10 @@ const createUsersVal = celebrate({
 const loginVal = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email().messages({
-      'any.require': 'Введен некорректный email',
+      'any.require': errMiddlewaresMessage.incorrectEmail,
     }),
     password: Joi.string().required().messages({
-      'any.require': 'Введен некорректный пароль',
+      'any.require': errMiddlewaresMessage.incorrectPassword,
     }),
   }),
 });
@@ -32,10 +33,10 @@ const updateUserVal = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30)
       .messages({
-        'any.require': 'Введено некорректное имя пользователя',
+        'any.require': errMiddlewaresMessage.incorrectName,
       }),
     email: Joi.string().required().email().messages({
-      'any.require': 'Введен некорректный email',
+      'any.require': errMiddlewaresMessage.incorrectEmail,
     }),
   }),
 });
@@ -43,37 +44,37 @@ const updateUserVal = celebrate({
 const createMovieVal = celebrate({
   body: Joi.object().keys({
     country: Joi.string().required().messages({
-      'any.require': 'Введены некорректные данные о стране создания фильма',
+      'any.require': errMiddlewaresMessage.incorrectCountry,
     }),
     director: Joi.string().required().messages({
-      'any.require': 'Введены некорректные данные о режиссере фильма',
+      'any.require': errMiddlewaresMessage.incorrectDirector,
     }),
     duration: Joi.number().required().messages({
-      'any.require': 'Введены некорректные данные о продолжительности фильма',
+      'any.require': errMiddlewaresMessage.incorrectDuration,
     }),
     year: Joi.string().required().messages({
-      'any.require': 'Введены некорректные данные о годе выпуска фильма',
+      'any.require': errMiddlewaresMessage.incorrectYear,
     }),
     description: Joi.string().required().messages({
-      'any.require': 'Введено некорректное описание фильма',
+      'any.require': errMiddlewaresMessage.incorrectDescription,
     }),
     image: Joi.string().required().pattern(urlRegExp).messages({
-      'any.require': 'Введена некорректная ссылка на постер к фильму',
+      'any.require': errMiddlewaresMessage.incorrectImage,
     }),
     trailerLink: Joi.string().required().pattern(urlRegExp).messages({
-      'any.require': 'Введена некорректная ссылка на трейлер фильма',
+      'any.require': errMiddlewaresMessage.incorrectTrailerLink,
     }),
     thumbnail: Joi.string().required().pattern(urlRegExp).messages({
-      'any.require': 'Введена некорректная ссылка на миниатюрное изображение постера к фильму',
+      'any.require': errMiddlewaresMessage.incorrectThumbnail,
     }),
     movieId: Joi.number().required().messages({
-      'any.require': 'Введен некорректный id фильма',
+      'any.require': errMiddlewaresMessage.incorrectMovieId,
     }),
     nameRU: Joi.string().required().messages({
-      'any.require': 'Введено некорректное название фильма на русском языке',
+      'any.require': errMiddlewaresMessage.incorrectNameRU,
     }),
     nameEN: Joi.string().required().messages({
-      'any.require': 'Введено некорректное название фильма на английском языке',
+      'any.require': errMiddlewaresMessage.incorrectNameEN,
     }),
   }),
 });
